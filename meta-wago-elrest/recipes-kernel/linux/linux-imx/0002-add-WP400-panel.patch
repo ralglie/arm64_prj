@@ -1,0 +1,963 @@
+From 2b21bc1d4d1efbc7726e1800197a8ba7053d0e01 Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <ralf.gliese@elrest.de>
+Date: Mon, 15 Dec 2025 13:24:38 +0100
+Subject: [PATCH] add WP400 panel
+Upstream-Status: Pending
+
+---
+ .../boot/dts/freescale/imx8mp-wp400-0007.dts  |  59 ++
+ .../boot/dts/freescale/imx8mp-wp400-0010.dts  |  60 ++
+ .../boot/dts/freescale/imx8mp-wp400-0015.dts  |  69 ++
+ .../boot/dts/freescale/imx8mp-wp400.dtsi      | 734 ++++++++++++++++++
+ 4 files changed, 922 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mp-wp400-0007.dts
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mp-wp400-0010.dts
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mp-wp400-0015.dts
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-wp400-0007.dts b/arch/arm64/boot/dts/freescale/imx8mp-wp400-0007.dts
+new file mode 100644
+index 000000000000..5d8389a46f4e
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mp-wp400-0007.dts
+@@ -0,0 +1,59 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Copyright 2023 elrest GmbH
++ */
++
++/dts-v1/;
++
++#include "imx8mp-wp400.dtsi"
++
++/ {
++	model = "WAGO iMX8M Plus WP400 web panel";
++	compatible = "wago,imx8mp-wp400", "fsl,imx8mp";
++
++	panel_lvds: panel-lvds {
++		compatible = "panel-lvds";
++		backlight = <&backlight>;
++		data-mapping = "vesa-24";
++		width-mm = <116>;
++		height-mm = <90>;
++		status = "okay";
++
++		panel-timing {
++			clock-frequency = <41193600>;
++			hactive = <1024>;
++			vactive = <600>;
++			hback-porch = <100>;
++			hfront-porch = <170>;
++			vback-porch = <5>;
++			vfront-porch = <5>;
++			hsync-len = <50>;
++			vsync-len = <3>;
++			hsync-active = <0>;
++			vsync-active = <0>;
++			de-active    = <1>;
++		};
++
++		port {
++			panel_lvds1_in: endpoint {
++				remote-endpoint = <&lvds1_out>;
++			};
++		};
++	};
++};
++
++&ldb {
++	status = "okay";
++
++	lvds_channel0: lvds-channel@0 {
++		fsl,data-mapping = "spwg"; 
++		fsl,data-width = <24>;
++		status = "okay";
++		port@1 {
++			reg = <1>;
++			lvds1_out: endpoint {
++				remote-endpoint = <&panel_lvds1_in>;
++			};
++		};
++	};
++};
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-wp400-0010.dts b/arch/arm64/boot/dts/freescale/imx8mp-wp400-0010.dts
+new file mode 100644
+index 000000000000..764b1598087a
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mp-wp400-0010.dts
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Copyright 2023 elrest GmbH
++ */
++
++/dts-v1/;
++
++#include "imx8mp-wp400.dtsi"
++
++/ {
++	model = "WAGO iMX8M Plus WP400 web panel";
++	compatible = "wago,imx8mp-wp400", "fsl,imx8mp";
++
++	panel_lvds: panel-lvds {
++		compatible = "panel-lvds";
++		backlight = <&backlight>;
++		data-mapping = "vesa-24";
++		width-mm = <216>;
++		height-mm = <135>;
++		status = "okay";
++
++		panel-timing {
++			clock-frequency = <71107200>;
++			hactive = <1280>;
++			vactive = <800>;
++			hback-porch = <50>;
++			hfront-porch = <50>;
++			vback-porch = <8>;
++			vfront-porch = <5>;
++			hsync-len = <60>;
++			vsync-len = <10>;
++			hsync-active = <1>;
++			vsync-active = <1>;
++			de-active = <1>;
++			pixelclk-active = <1>;
++		};
++
++		port {
++			panel_lvds1_in: endpoint {
++				remote-endpoint = <&lvds1_out>;
++			};
++		};
++	};
++};
++
++&ldb {
++	status = "okay";
++
++	lvds_channel0: lvds-channel@0 {
++		fsl,data-mapping = "spwg";
++		fsl,data-width = <24>;
++		status = "okay";
++		port@1 {
++			reg = <1>;
++			lvds1_out: endpoint {
++				remote-endpoint = <&panel_lvds1_in>;
++			};
++		};
++	};
++};
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-wp400-0015.dts b/arch/arm64/boot/dts/freescale/imx8mp-wp400-0015.dts
+new file mode 100644
+index 000000000000..167cc2b6f275
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mp-wp400-0015.dts
+@@ -0,0 +1,69 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/*
++ * Copyright 2023 elrest GmbH
++ */
++
++/dts-v1/;
++
++#include "imx8mp-wp400.dtsi"
++
++/* dual channel lvds TP600 */
++/ {
++	model = "WAGO iMX8M Plus WP400 web panel";
++	compatible = "wago,imx8mp-wp400", "fsl,imx8mp";
++
++	panel {
++		compatible = "panel-lvds";
++		backlight = <&backlight>;
++		width-mm = <216>;
++		height-mm = <135>;
++		/*  "jeida-18", "jeida-24", "vesa-24" */
++		data-mapping = "vesa-24";
++		status = "okay";
++
++		panel-timing {
++			/* 60 Hz */
++			//clock-frequency = <140883840>;
++			/* 60 Hz */
++			clock-frequency = <117403200>;
++			hactive = <1920>;
++			vactive = <1080>;
++			hback-porch = <150>;
++			hfront-porch = <10>;
++			vback-porch = <20>;
++			vfront-porch = <6>;
++			hsync-len = <24>;
++			vsync-len = <10>;
++			hsync-active = <1>;
++			vsync-active = <1>;
++			de-active = <1>;
++			pixelclk-active = <0>;
++		};
++
++		port {
++			panel_lvds1_in: endpoint {
++				remote-endpoint = <&lvds1_out>;
++			};
++		};
++	};
++
++};
++
++&ldb {
++	status = "okay";
++	fsl,dual-channel;
++
++	lvds_channel0: lvds-channel@0 {
++		/*  "jeida" or "spwg" */
++		fsl,data-mapping = "spwg"; 
++		fsl,data-width = <24>;
++		status = "okay";
++
++		port@1 {
++			reg = <1>;
++			lvds1_out: endpoint {
++				remote-endpoint = <&panel_lvds1_in>;
++			};
++		};
++	};
++};
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi b/arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi
+new file mode 100644
+index 000000000000..386052019a0d
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi
+@@ -0,0 +1,734 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/*
++ * Copyright 2023 elrest GmbH
++ */
++
++#include "imx8mp.dtsi"
++#include <dt-bindings/usb/pd.h>
++#include <dt-bindings/clock/imx8mp-clock.h>
++
++/ {
++	chosen {
++		stdout-path = &uart1;
++	};
++
++	aliases {
++		/* Ethernet aliases to ensure correct MAC addresses */
++		ethernet0 = &fec;
++		mmc0 = &usdhc2;
++		mmc1 = &usdhc3;
++		rtc0 = &rtc_i2c;
++		rtc1 = &snvs_rtc;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			size = <0x0 0x10000000>;
++			alignment = <0x0 0x400000>;
++			linux,cma-default;
++		};
++	};
++
++	reg_usdhc2_vmmc: regulator-usdhc2 {
++		compatible = "regulator-fixed";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
++		regulator-name = "VSD_3V3";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		startup-delay-us = <100>;
++		off-on-delay-us = <12000>;
++	};
++
++	reg_eth_phy: eth_phy {
++		compatible = "regulator-fixed";
++		regulator-name = "eth_phy_pwr";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		//gpio = <&gpio1 0 GPIO_ACTIVE_HIGH>;
++	};
++
++	reg_usb1_vbus: regulator-usb1-vbus {
++		compatible = "regulator-fixed";
++		regulator-max-microvolt = <5000000>;
++		regulator-min-microvolt = <5000000>;
++		regulator-name = "USB_1_EN";
++		regulator-always-on;
++	};
++
++	reg_usb2_vbus: regulator-usb2-vbus {
++		compatible = "regulator-fixed";
++		regulator-max-microvolt = <5000000>;
++		regulator-min-microvolt = <5000000>;
++		regulator-name = "USB_2_EN";
++		regulator-always-on;
++	};
++
++	reg_lvds_backlight_3v3: regulator@3 {
++		compatible = "regulator-fixed";
++		regulator-name = "lvds-3v3";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-always-on;
++	};
++
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&pwm1 0 33000 0>;
++		brightness-levels =
++			< 0   1   2   3   4   5   6   7   8   9
++			 10  11  12  13  14  15  16  17  18  19
++			 20  21  22  23  24  25  26  27  28  29
++			 30  31  32  33  34  35  36  37  38  39
++			 40  41  42  43  44  45  46  47  48  49
++			 50  51  52  53  54  55  56  57  58  59
++			 60  61  62  63  64  65  66  67  68  69
++			 70  71  72  73  74  75  76  77  78  79
++			 80  81  82  83  84  85  86  87  88  89
++			 90  91  92  93  94  95  96  97  98  99
++			100 101 102 103 104 105 106 107 108 109
++			110 111 112 113 114 115 116 117 118 119
++			120 121 122 123 124 125 126 127 128 129
++			130 131 132 133 134 135 136 137 138 139
++			140 141 142 143 144 145 146 147 148 149
++			150 151 152 153 154 155 156 157 158 159
++			160 161 162 163 164 165 166 167 168 169
++			170 171 172 173 174 175 176 177 178 179
++			180 181 182 183 184 185 186 187 188 189
++			190 191 192 193 194 195 196 197 198 199
++			200 201 202 203 204 205 206 207 208 209
++			210 211 212 213 214 215 216 217 218 219
++			220 221 222 223 224 225 226 227 228 229
++			230 231 232 233 234 235 236 237 238 239
++			240 241 242 243 244 245 246 247 248 249
++			250 251 252 253 254 255>;
++		default-brightness-level = <0>;
++		power-supply = <&reg_lvds_backlight_3v3>;
++		status = "okay";
++	};
++
++	backlight_leds {
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_leds>;
++		compatible = "gpio-leds";
++
++		vlcd-on {
++			gpios = <&gpio4 28 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++		vled-on {
++			gpios = <&gpio4 25 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++		light-on {
++			gpios = <&gpio4 22 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++		lcd-on {
++			gpios = <&gpio4 31 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++		res-7inch {
++			gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
++			default-state = "on";
++		};
++		sys-green {
++			gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		sys-red {
++			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++	};
++
++	wsysinit: wsysinit_init {
++		compatible = "wago,sysinit";
++		
++		tty,service   = "ttymxc0";
++		tty,rs232-485 = "";
++		board,variant = "wp400";
++	};
++
++	PAC-Operating-Mode-Switch {
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_bas>;
++		compatible = "gpio-keys";
++		status = "okay";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		autorepeat;
++
++		reset_all {
++			label = "RESET_ALL";
++			gpios = <&gpio3 19 GPIO_ACTIVE_LOW>;
++			linux,code = <4>;
++			linux,input-type = <EV_KEY>;
++			debounce-interval = <1>; /* debounce in msecs */
++		};
++	};
++};
++
++&A53_0 {
++	cpu-supply = <&buck2>;
++};
++
++&A53_1 {
++	cpu-supply = <&buck2>;
++};
++
++&A53_2 {
++	cpu-supply = <&buck2>;
++};
++
++&A53_3 {
++	cpu-supply = <&buck2>;
++};
++
++&cpu_alert0 {
++	temperature = <95000>;
++};
++
++&cpu_crit0 {
++	temperature = <105000>;
++};
++
++&fec {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_fec>;
++	phy-mode = "rmii";
++	phy-handle = <&ethphy0>;
++	fsl,magic-packet;
++	phy-supply = <&reg_eth_phy>;
++	status = "okay";
++
++	mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		ethphy0: ethernet-phy@0 {
++			compatible = "ethernet-phy-ieee802.3-c22";
++			interrupt-parent = <&gpio1>;
++			interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
++			reg = <1>;
++			reset-gpios = <&gpio2 7 GPIO_ACTIVE_LOW>;
++			reset-assert-us = <10000>;
++			reset-deassert-us = <1000>;
++			status = "okay";
++		};
++	};
++};
++
++&i2c1 {
++	clock-frequency = <400000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i2c1>;
++	status = "okay";
++
++	pmic: pmic@25 {
++		compatible = "nxp,pca9450c";
++		reg = <0x25>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_pmic>;
++		interrupt-parent = <&gpio4>;
++		interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
++	
++		regulators {
++			buck1: BUCK1 {
++				regulator-name = "BUCK1";
++				regulator-min-microvolt = <600000>;
++				regulator-max-microvolt = <2187500>;
++				regulator-boot-on;
++				regulator-always-on;
++				regulator-ramp-delay = <3125>;
++			};
++
++			/* VDD_ARM */
++			buck2: BUCK2 {
++				regulator-name = "BUCK2";
++				regulator-min-microvolt = <600000>;
++				regulator-max-microvolt = <2187500>;
++				regulator-boot-on;
++				regulator-always-on;
++				regulator-ramp-delay = <3125>;
++				nxp,dvs-run-voltage = <850000>;
++				nxp,dvs-standby-voltage = <850000>;
++			};
++
++			buck4: BUCK4 {	/* VDD_3V3 */
++				regulator-compatible = "BUCK4";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-always-on;
++				regulator-boot-on;
++			};
++
++			buck5: BUCK5 {	/* VDD_1V8 */
++				regulator-compatible = "BUCK5";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-always-on;
++				regulator-boot-on;
++			};
++
++			buck6: BUCK6 {	/* NVCC_DRAM_1V1 */
++				regulator-compatible = "BUCK6";
++				regulator-min-microvolt = <1100000>;
++				regulator-max-microvolt = <1100000>;
++				regulator-always-on;
++				regulator-boot-on;
++			};
++
++			ldo1: LDO1 {	/* NVCC_SNVS_1V8 */
++				regulator-compatible = "LDO1";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-always-on;
++				regulator-boot-on;
++			};
++
++			ldo2: LDO2 {
++				regulator-compatible = "LDO2";
++				regulator-min-microvolt = <800000>;
++				regulator-max-microvolt = <800000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo3: LDO3 {	/* VDDA_1V8 */
++				regulator-compatible = "LDO3";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-always-on;
++				regulator-boot-on;
++			};
++
++			ldo4: LDO4 {	/* PMIC_LDO4 */
++				regulator-compatible = "LDO4";
++				regulator-min-microvolt = <900000>;
++				regulator-max-microvolt = <900000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo5: LDO5 {	/* VCC_SD2 */
++				regulator-compatible = "LDO5";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++		};
++	};
++};
++
++&i2c2 {
++	clock-frequency = <100000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i2c2>;
++	status = "okay";
++
++	eeprom: m24c512@54 {
++		compatible = "st,24c512", "at24";
++		reg = <0x54>;
++		wp-gpios = <&gpio3 22 0>;
++	};
++
++	rtc_i2c: rtc_r2221t@32 {
++		compatible = "ricoh,r2221tl";
++		reg = <0x32>;
++		interrupt-parent = <&gpio5>;
++		interrupts = <21 IRQ_TYPE_LEVEL_LOW>;
++	};
++
++	lm75: lm75@49 {
++		compatible = "national,lm75";
++		reg = <0x49>;
++	};
++
++	gt928@5d {
++		compatible = "goodix,gt9271";
++		reg = <0x5d>;
++		interrupt-parent = <&gpio1>;
++		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
++		irq-gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
++		reset-gpios = <&gpio2 1 GPIO_ACTIVE_LOW>;
++	};
++
++	illi2117a@26 {
++		compatible = "ilitek,ili2117";
++		reg = <0x26>;
++		interrupt-parent = <&gpio5>;
++		interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
++		reset-gpios = <&gpio2 1 GPIO_ACTIVE_LOW>;
++	};
++};
++
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart1>;
++	/delete-property/ dmas;
++	/delete-property/ dmas-names;
++	status = "okay";
++};
++
++/* SD CARD */
++&usdhc2 {
++	assigned-clocks = <&clk IMX8MP_CLK_USDHC2>;
++	assigned-clock-rates = <400000000>;
++	pinctrl-names = "default", "state_100mhz", "state_200mhz";
++	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
++	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
++	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
++	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
++	vmmc-supply = <&reg_usdhc2_vmmc>;
++	bus-width = <4>;
++	/delete-property/ dmas;
++	/delete-property/ dmas-names;
++	status = "okay";
++};
++
++/* eMMC */
++&usdhc3 {
++	assigned-clocks = <&clk IMX8MP_CLK_USDHC1_ROOT>;
++	assigned-clock-rates = <400000000>;
++	pinctrl-names = "default", "state_100mhz", "state_200mhz";
++	pinctrl-0 = <&pinctrl_usdhc3>;
++	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
++	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
++	bus-width = <8>;
++	non-removable;
++	no-mmc-hs400;
++	no-1-8-v;
++	status = "okay";
++};
++
++&wdog1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_wdog>;
++	fsl,ext-reset-output;
++	status = "okay";
++};
++
++&pwm1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_pwm1>;
++	status = "okay";
++};
++
++&usb3_phy0 {
++	vbus-supply = <&reg_usb1_vbus>;
++	status = "okay";
++};
++
++&usb3_0 {
++	fsl,over-current-active-low;
++	status = "okay";
++};
++
++&usb_dwc3_0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usb1>;
++	dr_mode = "host";
++	status = "okay";
++};
++
++&usb3_phy1 {
++	vbus-supply = <&reg_usb2_vbus>;
++	status = "okay";
++};
++
++&usb3_1 {
++	status = "okay";
++};
++
++&usb_dwc3_1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_usb2>;
++	dr_mode = "host";
++	status = "okay";
++};
++
++&iomuxc {
++	/* RMII */
++	pinctrl_fec: fecgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SAI1_RXD2__ENET1_MDC			0x3
++			MX8MP_IOMUXC_SAI1_RXD3__ENET1_MDIO			0x3
++			MX8MP_IOMUXC_SAI1_RXD4__ENET1_RGMII_RD0		0x91
++			MX8MP_IOMUXC_SAI1_RXD5__ENET1_RGMII_RD1		0x91
++			MX8MP_IOMUXC_SAI1_TXFS__ENET1_RGMII_RX_CTL	0x91
++			MX8MP_IOMUXC_SAI1_TXD6__ENET1_RX_ER			0x91
++			MX8MP_IOMUXC_SAI1_TXD0__ENET1_RGMII_TD0		0x1f
++			MX8MP_IOMUXC_SAI1_TXD1__ENET1_RGMII_TD1		0x1f
++			MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL	0x1f
++			/* Clock */
++			MX8MP_IOMUXC_SAI1_MCLK__ENET1_TX_CLK		0x4000001f
++			/* IRQ */
++			MX8MP_IOMUXC_GPIO1_IO09__GPIO1_IO09			0x11
++			/* RESET */
++			MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07			0x11
++		>;
++	};
++
++	pinctrl_usb1: usb1grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_GPIO1_IO12__USB1_PWR	0x19
++			MX8MP_IOMUXC_GPIO1_IO13__USB1_OC	0x140
++		>;
++	};
++
++	pinctrl_usb2: usb2grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_GPIO1_IO14__USB2_PWR	0x19
++		>;
++	};
++
++	pinctrl_i2c1: i2c1grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_I2C1_SCL__I2C1_SCL		0x400001c2
++			MX8MP_IOMUXC_I2C1_SDA__I2C1_SDA		0x400001c2
++		>;
++	};
++
++	pinctrl_i2c2: i2c2grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_I2C2_SCL__I2C2_SCL		0x400001c2
++			MX8MP_IOMUXC_I2C2_SDA__I2C2_SDA		0x400001c2
++			MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01	0x1c4
++			MX8MP_IOMUXC_SD1_CMD__GPIO2_IO01	0x1c4
++			MX8MP_IOMUXC_I2C4_SDA__GPIO5_IO21	0x1c4
++			MX8MP_IOMUXC_UART4_RXD__GPIO5_IO28	0x1c4
++		>;
++	};
++
++	pinctrl_leds: ledsgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22	0x19
++			MX8MP_IOMUXC_SAI2_TXC__GPIO4_IO25	0x19
++			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28	0x19
++			MX8MP_IOMUXC_SAI3_TXFS__GPIO4_IO31	0x19
++			MX8MP_IOMUXC_SD1_DATA6__GPIO2_IO08	0x19
++			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10	0x19
++			MX8MP_IOMUXC_GPIO1_IO03__GPIO1_IO03	0x19
++		>;
++	};
++
++	pinctrl_uart1: uart1grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_UART1_RXD__UART1_DCE_RX		0x1c4
++			MX8MP_IOMUXC_UART1_TXD__UART1_DCE_TX		0x1c4
++		>;
++	};
++
++	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SD2_RESET_B__GPIO2_IO19	0x40
++		>;
++	};
++
++	pinctrl_usdhc2_gpio: usdhc2grp-gpio {
++		fsl,pins = <
++			MX8MP_IOMUXC_SD2_CD_B__GPIO2_IO12		0x40000080
++		>;
++	};
++
++	pinctrl_usdhc2: usdhc2grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SD2_CLK__USDHC2_CLK		0x110
++			MX8MP_IOMUXC_SD2_CMD__USDHC2_CMD		0x1d0
++			MX8MP_IOMUXC_SD2_DATA0__USDHC2_DATA0	0x1d0
++			MX8MP_IOMUXC_SD2_DATA1__USDHC2_DATA1	0x1d0
++			MX8MP_IOMUXC_SD2_DATA2__USDHC2_DATA2	0x1d0
++			MX8MP_IOMUXC_SD2_DATA3__USDHC2_DATA3	0x1d0
++			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT	0xc0
++		>;
++	};
++
++	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SD2_CLK__USDHC2_CLK		0x110
++			MX8MP_IOMUXC_SD2_CMD__USDHC2_CMD		0x1d4
++			MX8MP_IOMUXC_SD2_DATA0__USDHC2_DATA0	0x1d4
++			MX8MP_IOMUXC_SD2_DATA1__USDHC2_DATA1	0x1d4
++			MX8MP_IOMUXC_SD2_DATA2__USDHC2_DATA2	0x1d4
++			MX8MP_IOMUXC_SD2_DATA3__USDHC2_DATA3	0x1d4
++			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT 0xc0
++		>;
++	};
++
++	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SD2_CLK__USDHC2_CLK		0x110
++			MX8MP_IOMUXC_SD2_CMD__USDHC2_CMD		0x1d6
++			MX8MP_IOMUXC_SD2_DATA0__USDHC2_DATA0	0x1d6
++			MX8MP_IOMUXC_SD2_DATA1__USDHC2_DATA1	0x1d6
++			MX8MP_IOMUXC_SD2_DATA2__USDHC2_DATA2	0x1d6
++			MX8MP_IOMUXC_SD2_DATA3__USDHC2_DATA3	0x1d6
++			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT 0xc0
++		>;
++	};
++
++	pinctrl_usdhc3: usdhc3grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_NAND_WE_B__USDHC3_CLK			0x190
++			MX8MP_IOMUXC_NAND_WP_B__USDHC3_CMD			0x1d0
++			MX8MP_IOMUXC_NAND_DATA04__USDHC3_DATA0		0x1d0
++			MX8MP_IOMUXC_NAND_DATA05__USDHC3_DATA1		0x1d0
++			MX8MP_IOMUXC_NAND_DATA06__USDHC3_DATA2		0x1d0
++			MX8MP_IOMUXC_NAND_DATA07__USDHC3_DATA3		0x1d0
++			MX8MP_IOMUXC_NAND_RE_B__USDHC3_DATA4		0x1d0
++			MX8MP_IOMUXC_NAND_CE2_B__USDHC3_DATA5		0x1d0
++			MX8MP_IOMUXC_NAND_CE3_B__USDHC3_DATA6		0x1d0
++			MX8MP_IOMUXC_NAND_CLE__USDHC3_DATA7			0x1d0
++			MX8MP_IOMUXC_NAND_READY_B__USDHC3_RESET_B	0x190
++		>;
++	};
++
++	pinctrl_usdhc3_100mhz: usdhc3-100mhzgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_NAND_WE_B__USDHC3_CLK			0x194
++			MX8MP_IOMUXC_NAND_WP_B__USDHC3_CMD			0x1d4
++			MX8MP_IOMUXC_NAND_DATA04__USDHC3_DATA0		0x1d4
++			MX8MP_IOMUXC_NAND_DATA05__USDHC3_DATA1		0x1d4
++			MX8MP_IOMUXC_NAND_DATA06__USDHC3_DATA2		0x1d4
++			MX8MP_IOMUXC_NAND_DATA07__USDHC3_DATA3		0x1d4
++			MX8MP_IOMUXC_NAND_RE_B__USDHC3_DATA4		0x1d4
++			MX8MP_IOMUXC_NAND_CE2_B__USDHC3_DATA5		0x1d4
++			MX8MP_IOMUXC_NAND_CE3_B__USDHC3_DATA6		0x1d4
++			MX8MP_IOMUXC_NAND_CLE__USDHC3_DATA7			0x1d4
++			MX8MP_IOMUXC_NAND_READY_B__USDHC3_RESET_B	0x194
++		>;
++	};
++
++	pinctrl_usdhc3_200mhz: usdhc3-200mhzgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_NAND_WE_B__USDHC3_CLK			0x196
++			MX8MP_IOMUXC_NAND_WP_B__USDHC3_CMD			0x1d6
++			MX8MP_IOMUXC_NAND_DATA04__USDHC3_DATA0		0x1d2
++			MX8MP_IOMUXC_NAND_DATA05__USDHC3_DATA1		0x1d2
++			MX8MP_IOMUXC_NAND_DATA06__USDHC3_DATA2		0x1d2
++			MX8MP_IOMUXC_NAND_DATA07__USDHC3_DATA3		0x1d2
++			MX8MP_IOMUXC_NAND_RE_B__USDHC3_DATA4		0x1d2
++			MX8MP_IOMUXC_NAND_CE2_B__USDHC3_DATA5		0x1d2
++			MX8MP_IOMUXC_NAND_CE3_B__USDHC3_DATA6		0x1d2
++			MX8MP_IOMUXC_NAND_CLE__USDHC3_DATA7			0x1d2
++			MX8MP_IOMUXC_NAND_READY_B__USDHC3_RESET_B	0x196
++		>;
++	};
++
++	/* PMIC_WDI */
++	pinctrl_wdog: wdoggrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_GPIO1_IO02__WDOG1_WDOG_B	0xc6
++		>;
++	};
++
++	/* PMIC_NINT */
++	pinctrl_pmic: pmicgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SAI1_RXFS__GPIO4_IO00		0xc6
++		>;
++	};
++
++	pinctrl_pwm1: pwm1grp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SPDIF_EXT_CLK__PWM1_OUT	0x116
++		>;
++	};
++
++	pinctrl_bas: basgrp {
++		fsl,pins = <
++			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19		0xc6
++		>;
++	};
++
++};
++
++&tmu {
++	throttle-cfgs {
++		throttle_devfreq: devfreq {
++			throttle,max_state = <2>;
++			#cooling-cells = <2>;
++		};
++	};
++};
++
++#if 0
++&{/thermal-zones} {
++	cpu-thermal {
++		polling-delay-passive = <250>;
++		polling-delay = <2000>;
++		thermal-sensors = <&tmu 0>;
++
++		trips {
++			cpu_alert0: trip0 {
++				temperature = <80000>;
++				hysteresis = <2000>;
++				type = "passive";
++			};
++			cpu_alert1: trip1 {
++				temperature = <85000>;
++				hysteresis = <2000>;
++				type = "passive";
++			};
++			cpu-crit {
++				temperature = <95000>;
++				hysteresis = <2000>;
++				type = "critical";
++			};
++		};
++
++		cooling-maps {
++			map0 {
++				trip = <&cpu_alert0>;
++				cooling-device =
++					<&throttle_devfreq 0 1>,
++					<&A53_0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++					<&A53_1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++					<&A53_2 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++					<&A53_3 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
++			};
++			map1 {
++				trip = <&cpu_alert1>;
++				cooling-device =
++					<&throttle_devfreq 0 2>;
++			};
++		};
++	};
++};
++#endif
++
++&gpu_2d {
++	compatible = "fsl,imx8-gpu", "vivante,gc";
++	status = "okay";
++};
++
++&gpu_3d {
++	compatible = "fsl,imx8-gpu", "vivante,gc";
++	status = "okay";
++};
++
++&lcdif2 {
++	status = "okay";
++};
++
++&ldb {
++	status = "okay";
++};
++
++&ldb_phy {
++	status = "okay";
++};
++
++&mix_gpu_ml {
++	status = "okay";
++};

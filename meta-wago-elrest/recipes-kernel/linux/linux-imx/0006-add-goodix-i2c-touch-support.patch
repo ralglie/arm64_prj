@@ -1,0 +1,56 @@
+From 3cf311bba25115176a6ab02443e4867d22586ed6 Mon Sep 17 00:00:00 2001
+From: Ralf Gliese <ralf.gliese@elrest.de>
+Date: Thu, 25 Dec 2025 14:26:53 +0100
+Subject: [PATCH] add goodix i2c touch support
+
+---
+ arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi | 11 +++++++++++
+ arch/arm64/configs/imx_v8_defconfig             |  6 ++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi b/arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi
+index e1badbc781b2..741332d8cc23 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8mp-wp400.dtsi
+@@ -370,6 +370,17 @@ illi2117a@26 {
+ 		interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
+ 		reset-gpios = <&gpio2 1 GPIO_ACTIVE_LOW>;
+ 	};
++
++	gt911: gt911@14 {
++		compatible = "goodix,gt911";
++		reg = <0x14>;
++		interrupt-parent = <&gpio5>;
++		interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
++		reset-gpios = <&gpio2 1 GPIO_ACTIVE_LOW>;
++		touchscreen-size-x = <800>;
++		touchscreen-size-y = <480>;
++	};
++
+ };
+ 
+ &uart1 {
+diff --git a/arch/arm64/configs/imx_v8_defconfig b/arch/arm64/configs/imx_v8_defconfig
+index 739b0a08c242..4aaf7a6b93ea 100644
+--- a/arch/arm64/configs/imx_v8_defconfig
++++ b/arch/arm64/configs/imx_v8_defconfig
+@@ -381,6 +381,7 @@ CONFIG_KEYBOARD_SNVS_PWRKEY=y
+ CONFIG_KEYBOARD_IMX_SC_KEY=y
+ CONFIG_KEYBOARD_CROS_EC=y
+ CONFIG_INPUT_TOUCHSCREEN=y
++CONFIG_TOUCHSCREEN_GOODIX=y
+ CONFIG_TOUCHSCREEN_ILI210X=y
+ CONFIG_TOUCHSCREEN_ILITEK=y
+ # CONFIG_TOUCHSCREEN_SYNAPTICS_DSX is not set
+@@ -683,8 +684,9 @@ CONFIG_SND_AUDIO_GRAPH_CARD=y
+ CONFIG_SND_AUDIO_GRAPH_CARD2=y
+ CONFIG_SND_VIRTIO=y
+ CONFIG_HID_MULTITOUCH=m
+-CONFIG_I2C_HID_ACPI=m
+-CONFIG_I2C_HID_OF=m
++CONFIG_I2C_HID_ACPI=y
++CONFIG_I2C_HID_OF=y
++CONFIG_I2C_HID_OF_GOODIX=y
+ CONFIG_USB_CONN_GPIO=y
+ CONFIG_USB=y
+ CONFIG_USB_OTG=y
